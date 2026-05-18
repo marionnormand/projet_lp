@@ -1,0 +1,18 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Drone" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- 💡 Splash screen background -->
+        <item name="android:windowSplashScreenBackground">#EADFC4</item>
+
+        <!-- 💡 Logo du splash -->
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/logo</item>
+
+        <!-- 💡 Couleur du fond derrière le logo (optionnel) -->
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+
+        <!-- 💡 Thème après splash -->
+        <item name="postSplashScreenTheme">@style/Theme.Drone</item>
+    </style>
+
+    <style name="Theme.Drone" parent="Base.Theme.Drone" />
+</resources>
