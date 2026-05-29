@@ -4,8 +4,10 @@ import android.os.Bundle
 import androidx.preference.PreferenceManager // Changement ici
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.drone.mqtt.MqttManager
+import com.google.android.material.snackbar.Snackbar
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -21,35 +23,61 @@ class DroneStatusActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. IMPORTANT : Charger la config OSM
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this))
-        // Ajouter un User Agent pour éviter d'être bloqué par les serveurs OSM
         Configuration.getInstance().userAgentValue = packageName
 
         setContentView(R.layout.activity_drone_status)
 
-        // 2. Initialiser la Map
         map = findViewById(R.id.mapView)
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
 
+        val rootView = findViewById<View>(android.R.id.content)
+        val tvBatterie = findViewById<TextView>(R.id.tvBatterie)
+        val tvTrajet = findViewById<TextView>(R.id.tvTrajet)
+
         val mapController = map.controller
-        mapController.setZoom(15.0)
+        mapController.setZoom(17.0) // Zoom un peu plus serré pour voir le drone bouger
         val startPoint = GeoPoint(48.8566, 2.3522) // Paris par défaut
         mapController.setCenter(startPoint)
 
-        // 3. Bouton retour
-        findViewById<Button>(R.id.btnBack).setOnClickListener {
-            finish()
-        }
-
-        // 4. Connexion MQTT
-        mqttManager.connect {
-            mqttManager.subscribe("projet/drone/map") { message ->
+        // 1. Déconnexion des blocs d'écoute pour les mettre AU BON ENDROIT
+        mqttManager.connect(
+            onConnected = {
                 runOnUiThread {
-                    updateDroneLocation(message)
+                    Snackbar.make(rootView, "Connecté au Drone !", Snackbar.LENGTH_SHORT).show()
+                }
+
+                // CRUCIAL : On ne s'abonne QUE lorsque la connexion est validée !
+                mqttManager.subscribe("projet/drone/map") { message1 ->
+                    runOnUiThread {
+                        updateDroneLocation(message1)
+                    }
+                }
+
+                mqttManager.subscribe("projet/drone/batterie") { message2 ->
+                    runOnUiThread {
+                        tvBatterie.text = "Batterie : $message2 V"
+                    }
+                }
+
+                mqttManager.subscribe("projet/drone/trajet") { message3 ->
+                    runOnUiThread {
+                        tvTrajet.text = "En trajet : $message3"
+                    }
+                }
+            },
+            onError = { erreur ->
+                runOnUiThread {
+                    Snackbar.make(rootView, "Erreur de liaison : $erreur", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Fermer") {}
+                        .show()
                 }
             }
+        )
+
+        findViewById<Button>(R.id.btnBack).setOnClickListener {
+            finish()
         }
     }
 

@@ -33,52 +33,27 @@
         app:layout_constraintTop_toBottomOf="@id/titleText">
 
         <!-- Ligne Batterie -->
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvBatterie"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Batterie :"
-                android:textColor="#AB2626"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvBatterie"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:textColor="#AB2626"
-                android:textSize="18sp" />
-        </LinearLayout>
+            android:layout_marginStart="16dp"
+            android:text="Batterie : "
+            android:textColor="#AB2626"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <!-- Ligne En trajet -->
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvTrajet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp">
+            android:layout_marginStart="16dp"
+            android:text="En trajet : "
+            android:textColor="#AB2626"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="En trajet :"
-                android:textColor="#AB2626"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvTrajet"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:textColor="#AB2626"
-                android:textSize="18sp" />
-        </LinearLayout>
     </LinearLayout>
 
     <org.osmdroid.views.MapView

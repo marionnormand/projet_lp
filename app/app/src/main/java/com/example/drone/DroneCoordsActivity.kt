@@ -22,12 +22,30 @@ class DroneCoordsActivity : AppCompatActivity() {
 
         val coordonnees = findViewById<EditText>(R.id.editTextCoords)
         val rootView = findViewById<View>(android.R.id.content)
-        
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        // Au démarrage de la page, on tente la connexion
+        mqttManager.connect(
+            onConnected = {
+                runOnUiThread {
+                    Snackbar.make(rootView, "Connecté au Broker Raspberry !", Snackbar.LENGTH_SHORT).show()
+                }
+            },
+            onError = { erreur ->
+                runOnUiThread {
+                    // C'est ici qu'on va voir la vraie cause (ex: "MqttException: Malformed IPv4 address" ou "Connection timed out")
+                    Snackbar.make(rootView, "Erreur MQTT : $erreur", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Fermer") {}
+                        .show()
+                }
+            }
+        )
+
         findViewById<Button>(R.id.btnBack).setOnClickListener {
             finish()
         }
@@ -36,18 +54,11 @@ class DroneCoordsActivity : AppCompatActivity() {
             val inputText = coordonnees.text.toString()
 
             if (inputText.isNotEmpty()) {
-                mqttManager.connect {
-                    // Ce code s'exécute une fois connecté
-                    mqttManager.publish("projet/drone", inputText)
+                mqttManager.publish("projet/drone", inputText)
 
-                    runOnUiThread {
-                        Snackbar.make(rootView, "Coordonnées envoyées", Snackbar.LENGTH_LONG).show()
-                    }
-                }
+                Snackbar.make(rootView, "Coordonnées envoyées : $inputText", Snackbar.LENGTH_LONG).show()
             } else {
-                runOnUiThread {
-                    Snackbar.make(rootView, "Champs de texte vide", Snackbar.LENGTH_LONG).show()
-                }
+                Snackbar.make(rootView, "Champ de texte vide", Snackbar.LENGTH_LONG).show()
             }
         }
     }
