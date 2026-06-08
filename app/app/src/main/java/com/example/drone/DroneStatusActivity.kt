@@ -41,14 +41,12 @@ class DroneStatusActivity : AppCompatActivity() {
         val startPoint = GeoPoint(48.8566, 2.3522) // Paris par défaut
         mapController.setCenter(startPoint)
 
-        // 1. Déconnexion des blocs d'écoute pour les mettre AU BON ENDROIT
         mqttManager.connect(
             onConnected = {
                 runOnUiThread {
                     Snackbar.make(rootView, "Connecté au Drone !", Snackbar.LENGTH_SHORT).show()
                 }
 
-                // CRUCIAL : On ne s'abonne QUE lorsque la connexion est validée !
                 mqttManager.subscribe("projet/drone/map") { message1 ->
                     runOnUiThread {
                         updateDroneLocation(message1)
@@ -92,7 +90,6 @@ class DroneStatusActivity : AppCompatActivity() {
                 if (droneMarker == null) {
                     droneMarker = Marker(map)
                     droneMarker?.title = "Drone"
-                    // Suppression de l'import compose.foundation.layout.add qui créait l'erreur
                     map.overlays.add(droneMarker)
                 }
 

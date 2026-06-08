@@ -14,7 +14,6 @@ class MqttManager {
     private val broker = "tcp://192.168.0.10:1883"
     private val clientId = "AndroidDrone_" + UUID.randomUUID().toString().take(5)
 
-    // CORRECTION : On stocke les écouteurs associés à chaque topic distinct
     private val topicCallbacks = HashMap<String, (String) -> Unit>()
 
     fun connect(onConnected: () -> Unit, onError: (String) -> Unit) {
@@ -28,7 +27,6 @@ class MqttManager {
                     mqttVersion = MqttConnectOptions.MQTT_VERSION_3_1_1
                 }
 
-                // CORRECTION : On configure le routeur de messages global UNE SEULE FOIS ici
                 client?.setCallback(object : MqttCallback {
                     override fun connectionLost(cause: Throwable?) {
                         println("MQTT : Connexion perdue avec le broker : ${cause?.message}")
@@ -78,10 +76,8 @@ class MqttManager {
 
     fun subscribe(topic: String, onMessageReceived: (String) -> Unit) {
         try {
-            // 1. On enregistre le bloc de code dans notre dictionnaire pour ce topic
             topicCallbacks[topic] = onMessageReceived
 
-            // 2. On demande au broker de nous envoyer les messages de ce topic
             if (client?.isConnected == true) {
                 client?.subscribe(topic)
                 println("MQTT : Abonnement validé pour le topic [$topic]")
