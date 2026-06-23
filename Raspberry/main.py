@@ -2,7 +2,7 @@
 import threading
 import time
 from mqtt_client import MqttGateway
-from mavlink_client import connect_mavlink, deconnexion_mavlink, listen_mavlink, send_mavlink
+from mavlink_client import connect_mavlink, deconnexion_mavlink, listen_mavlink, send_mavlink, executer_mission_livraison
 
 PORT = 1883
 BROKER = "localhost"
@@ -23,7 +23,9 @@ def traiter_message_mqtt(topic, payload):
     		latitude = float(coords[0])
     		longitude = float(coords[1])
     		print(f"A ENVOYER AU DRONE : LAT: {latitude}, LON: {longitude}")
-    		send_mavlink(vehicle, latitude, longitude, 5) # 5 metres de haut 
+    		# send_mavlink(vehicle, latitude, longitude, 5) # 5 metres de haut 
+    		thread_mission = threading.Thread(target=executer_mission_livraison, args=(vehicle, lat, lon, 2))
+    		thread_mission.start()
     	except (ValueError, IndexError) as e: 
     		print(f"[MQTT] Erreur de formatage du payload ('{payload}') : {e}")
     
